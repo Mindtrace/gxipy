@@ -20,5 +20,8 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ]
+    ],
+    package_data={
+        'gxipy': ['APIDll/Win32/*.dll', 'APIDll/Win64/*.dll'],  # Include all DLLs in the dlls directory
+    },
 )
