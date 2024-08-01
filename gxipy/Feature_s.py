@@ -17,7 +17,7 @@ else:
 
 class Feature_s:
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -27,7 +27,7 @@ class Feature_s:
 
 class IntFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -37,7 +37,7 @@ class IntFeature_s(Feature_s):
         self.__feature_name = feature_name
 
     def __range_dicts(self, feature_value):
-        """
+        r"""
         :brief      Convert feature info to list
         :param feature_value:   Int type feature info
         :return:    Feature info list
@@ -87,7 +87,7 @@ class IntFeature_s(Feature_s):
 
 class EnumFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -144,7 +144,7 @@ class EnumFeature_s(Feature_s):
 
 class FloatFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -203,7 +203,7 @@ class FloatFeature_s(Feature_s):
 
 class BoolFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -236,7 +236,7 @@ class BoolFeature_s(Feature_s):
 
 class StringFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -278,7 +278,7 @@ class StringFeature_s(Feature_s):
 
 class CommandFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
@@ -298,7 +298,7 @@ class CommandFeature_s(Feature_s):
 
 class RegisterFeature_s(Feature_s):
     def __init__(self, handle, feature_name):
-        """
+        r"""
         :brief  Constructor for instance initialization
         :param handle:          Interface featrue control handle\Device local layer feature control\Device remote layer featrure control\Device stream layer feature control
         :param feature_name:    Feature node name
