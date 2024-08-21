@@ -1,13 +1,10 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 # -*-mode:python ; tab-width:4 -*- ex:set tabstop=4 shiftwidth=4 expandtab: -*-
 # -*- coding:utf-8 -*-
 
 from ctypes import *
-import ctypes
 import sys
-import os
 
-NODE_FEATURE_RESERVED_16 = 16
 
 if sys.platform == 'linux2' or sys.platform == 'linux':
     try:
@@ -16,18 +13,7 @@ if sys.platform == 'linux2' or sys.platform == 'linux':
         print("Cannot find libgxiapi.so.")
 else:
     try:
-        env_dist = os.environ
-        GeniCam_AddPath32 = str(env_dist["GALAXY_GENICAM_ROOT"]) + r"\bin\Win32_i86"
-        GeniCam_AddPath64 = str(env_dist["GALAXY_GENICAM_ROOT"]) + r"\bin\Win64_x64"
-        GxiApi_AddPath32 = str(env_dist["GALAXY_GENICAM_ROOT"]).split("GenICam")[0] + r"\APIDll\Win32"
-        GxiApi_AddPath64 = str(env_dist["GALAXY_GENICAM_ROOT"]).split("GenICam")[0] + r"\APIDll\Win64"
-
         if (sys.version_info.major == 3 and sys.version_info.minor >= 8) or (sys.version_info.major > 3):
-            os.add_dll_directory(GeniCam_AddPath32)
-            os.add_dll_directory(GeniCam_AddPath64)
-            os.add_dll_directory(GxiApi_AddPath32)
-            os.add_dll_directory(GxiApi_AddPath64)
-            
             dll = WinDLL('GxIAPI.dll', winmode=0)
         else:
             dll = WinDLL('GxIAPI.dll')
@@ -60,86 +46,6 @@ class GxStatusList:
     def __init__(self):
         pass
 
-#Interface CXP type info
-class GXCxpInterfaceInfo(Structure):
-    _fields_ = [
-        ('interface_id', c_char*64),           # Interface ID
-        ('display_name', c_char*64),           # Display Name
-        ('serial_number', c_char*64),          # Serial Number
-        ('init_flag', c_uint),                # Init Flag
-        ('PCIE_info', c_uint),                   # PCIE Info
-        ('reserved', c_uint*64),                 # Reserved
-    ]
-    def __str__(self):
-        return "GXCxpInterfaceInfo\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-#Interface GEV type info
-class GXGevInterfaceInfo(Structure):
-    _fields_ = [
-        ('interface_id', c_char * 64),         # Interface ID
-        ('display_name', c_char * 64),         # Display Name
-        ('serial_number', c_char * 64),        # Serial Number
-        ('description', c_char * 256),        # Description
-        ('reserved', c_uint*64),                   # Reserved
-    ]
-    def __str__(self):
-        return "GXGevInterfaceInfo\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-#Interface U3V type info
-class GXU3vInterfaceInfo(Structure):
-    _fields_ = [
-        ('interface_id', c_char*64),         # Interface ID
-        ('display_name', c_char*64),         # Display Name
-        ('serial_number', c_char*64),        # Serial Number
-        ('description', c_char*256),        # Description
-        ('reserved', c_uint*64),                 # Reserved
-    ]
-    def __str__(self):
-        return "GXU3vInterfaceInfo\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-#Interface USB type info
-class GXUsbInterfaceInfo(Structure):
-    _fields_ = [
-        ('interface_id', c_char * 64),         # Interface ID
-        ('display_name', c_char * 64),         # Display Name
-        ('serial_number', c_char * 64),        # Serial Number
-        ('description', c_char * 256),        # Description
-        ('reserved', c_uint*64),                   # Reserved
-    ]
-    def __str__(self):
-        return "GXUsbInterfaceInfo\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-# Interface Special info
-class GXInterfacSpecialInfo(Union):
-    _fields_ = [
-        ("CXP_interface_info", GXCxpInterfaceInfo),  # CXP Type
-        ("GEV_interface_info", GXGevInterfaceInfo),  # Gev Type
-        ("U3V_interface_info", GXU3vInterfaceInfo),   # U3V Type
-        ("USB_interface_info", GXUsbInterfaceInfo),   # USB Type
-        ("reserved", c_uint*64),               # Reserved
-    ]
-    def __str__(self):
-        return "_GXInterfacSpecialInfo_\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-# Interface info
-class GXInterfaceInfo(Structure):
-    _fields_ = [
-        ('TLayer_type', c_int),         # TLayer Type
-        ('reserved', c_int*4),          # Reserved
-        ('IF_info', GXInterfacSpecialInfo),
-    ]
-    def __str__(self):
-        return "GXInterfaceInfo\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxRegisterStackEntry(Structure):
-    _fields_ = [
-        ('address'  , c_ulonglong),     # Address of the register
-        ('buffer'   , c_void_p),        # Pointer to the buffer containing the data
-        ('size'     , c_uint),          # Number of bytes to read
-    ]
-
-    def __str__(self):
-        return "GxRegisterStackEntry\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
 
 class GxOpenMode:
     SN = 0	                   # Opens the device via a serial number
@@ -158,16 +64,7 @@ class GxFrameMask:
     
     def __init__(self):
         pass
-
-
-class GxNodeAccessMode:
-    MODE_NI     = 0             # Not implemented
-    MODE_NA     = 1             # Not read and write
-    MODE_WO     = 2             # Only write
-    MODE_RO     = 3             # Only read
-    MODE_RW     = 4             # Read and Write
-    MODE_UNDEF  = 5             # Unknown
-
+    
 
 class GxFeatureType:
     INT = 0x10000000            # Integer type
@@ -212,27 +109,6 @@ class GxFeatureID:
     COMMAND_TIMESTAMP_RESET = 0x7000000f                   # Timestamp reset
     COMMAND_TIMESTAMP_LATCH_RESET = 0x70000010             # Timestamp latch reset
     INT_TIMESTAMP_LATCH_VALUE = 0x10000011                 # The value of timestamp latch
-    STRING_DEVICE_PHY_VERSION = 0x50000012                 # Device network chip version
-    ENUM_DEVICE_TEMPERATURE_SELECTOR = 0x30000013          # Device temperature selection, reference GxDeviceTemperatureSelectorEntry
-    FLOAT_DEVICE_TEMPERATURE = 0x20000014                  # Device temperature
-    STRING_DEVICE_ISP_FIRMWARE_VERSION = 0x50000015        # The version of device's ISP firmware
-    ENUM_LOWPOWER_MODE = 0x30000016                        # Low power consumption mode,refer
-    ENUM_CLOSE_CCD = 0x30000017                            # Close CCD
-    STRING_PRODUCTION_CODE = 0x50000018                    # Production code
-    STRING_DEVICE_ORIGINAL_NAME = 0x50000019               # Original name
-    INT_REVISION = 0x1000001a                              # CXP protocol version
-    INT_VERSIONS_SUPPORTED = 0x1000001b                    # Supported CXP protocol versions
-    INT_VERSION_USED = 0x1000001c                          # Use version
-    BOOL_TEC_ENABLE = 0x4000001d                           # TEC switch
-    FLOAT_TEC_TARGET_TEMPERATURE = 0x2000001e              # TEC target temperature
-    BOOL_FAN_ENABLE = 0x4000001f                           # Fan switch
-    INT_TEMPERATURE_DETECTION_STATUS = 0x10000020          # Temperature state detection
-    INT_FAN_SPEED = 0x10000021                             # Fan speed
-    FLOAT_DEVICE_HUMIDITY = 0x10000022                     # Equipment humidity
-    FLOAT_DEVICE_PRESSURE = 0x10000023                     # Equipment air pressure
-    INT_AIR_CHANGE_DETECTION_STATUS = 0x10000024           # Ventilation status detection
-    INT_AIR_TIGHTNESS_DETECTION_STATUS = 0x10000025        # Airtightness state detection
-    ENUM_DEVICE_SCAN_TYPE = 0x30000026                     # Device scanning mode
 
     # ---------------ImageFormat Section----------------------------------
     INT_SENSOR_WIDTH = 0x100003e8                           # The actual width of the camera's sensor in pixels
@@ -259,44 +135,30 @@ class GxFeatureID:
     ENUM_REGION_SELECTOR = 0x300003fd                       # ROI region select, reference GxRegionSelectorEntry
     INT_CENTER_WIDTH = 0x100003fe                           # Window width
     INT_CENTER_HEIGHT = 0x100003ff                          # Window height
-    ENUM_BINNING_HORIZONTAL_MODE = 0x30000400               # Binning horizontal mode, reference GxBinningHorizontalModeEntry
-    ENUM_BINNING_VERTICAL_MODE = 0x30000401                 # Binning vertical mode, reference GxBinningVerticalModeEntry
-    ENUM_SENSOR_SHUTTER_MODE = 0x30000402                   # Sensor shutter mode, reference GxSensorShutterModeEntry
-    INT_DECIMATION_LINENUMBER = 0x10000403                  # The line number of decimation
-    INT_SENSOR_DECIMATION_HORIZONTAL = 0x10000404           # Sensor Horizontal pixel sampling
-    INT_SENSOR_DECIMATION_VERTICAL = 0x10000405             # Sensor Vertical pixel sampling
-    ENUM_SENSOR_SELECTOR = 0x30000406                       # selector current sonsor
-    INT_CURRENT_SENSOR_WIDTH = 0x10000407                   # current sonsor width
-    INT_CURRENT_SENSOR_HEIGHT = 0x10000408                  # current sonsor height
-    INT_CURRENT_SENSOR_OFFSETX = 0x10000409                 # current sonsor offset X
-    INT_CURRENT_SENSOR_OFFSETY = 0x1000040a                 # current sonsor offset Y
-    INT_CURRENT_SENSOR_WIDTHMAX = 0x1000040b                # current sonsor width max
-    INT_CURRENT_SENSOR_HEIGHTMAX = 0x1000040c               # current sonsor height max
-    ENUM_SENSOR_BIT_DEPTH = 0x3000040d                      # Sensor Bit Depth
-    BOOL_WATERMARK_ENABLE = 0x4000040e                      # Watermark
+    ENUM_BINNING_HORIZONTAL_MODE = 0x30000400               # Binning horizontal mode
+    ENUM_BINNING_VERTICAL_MODE = 0x30000401                 # Binning vertical mode
 
     # ---------------TransportLayer Section-------------------------------
     INT_PAYLOAD_SIZE = 0x100007d0                           # Size of images in byte
-    BOOL_GEV_CURRENT_IP_CONFIGURATION_LLA = 0x400007d1      # (Only GEVDevice)IP configuration by LLA.
-    BOOL_GEV_CURRENT_IP_CONFIGURATION_DHCP = 0x400007d2     # (Only GEVDevice)IP configuration by DHCP
-    BOOL_GEV_CURRENT_IP_CONFIGURATION_PERSISTENT_IP = 0x400007d3   # (Only GEVDevice)IP configuration by PersistentIP
-    INT_ESTIMATED_BANDWIDTH = 0x100007d4                    # (Only GEVDevice)Estimated Bandwidth in Bps
-    INT_GEV_HEARTBEAT_TIMEOUT = 0x100007d5                  # (Only GEVDevice)The heartbeat timeout in milliseconds
-    INT_GEV_PACKET_SIZE = 0x100007d6                        # (Only GEVDevice)The packet size in bytes for each packet
-    INT_GEV_PACKET_DELAY = 0x100007d7                       # (Only GEVDevice)A delay between the transmission of each packet
-    INT_GEV_LINK_SPEED = 0x100007d8                         # (Only GEVDevice)The connection speed in Mbps
-    ENUM_DEVICE_TAP_GEOMETRY = 0x300007d9                   # Equipment geometry
+    BOOL_GEV_CURRENT_IP_CONFIGURATION_LLA = 0x400007d1      # IP configuration by LLA.
+    BOOL_GEV_CURRENT_IP_CONFIGURATION_DHCP = 0x400007d2     # IP configuration by DHCP
+    BOOL_GEV_CURRENT_IP_CONFIGURATION_PERSISTENT_IP = 0x400007d3   # IP configuration by PersistentIP
+    INT_ESTIMATED_BANDWIDTH = 0x100007d4                    # Estimated Bandwidth in Bps
+    INT_GEV_HEARTBEAT_TIMEOUT = 0x100007d5                  # The heartbeat timeout in milliseconds
+    INT_GEV_PACKET_SIZE = 0x100007d6                        # The packet size in bytes for each packet
+    INT_GEV_PACKET_DELAY = 0x100007d7                       # A delay between the transmission of each packet
+    INT_GEV_LINK_SPEED = 0x100007d8                         # The connection speed in Mbps
 
     # ---------------AcquisitionTrigger Section---------------------------
-    ENUM_ACQUISITION_MODE = 0x30000bb8                      # The mode of acquisition, reference GxAcquisitionModeEntry
+    ENUM_ACQUISITION_MODE = 0x30000bb8                      # The mode of acquisition, Reference: GxAcquisitionModeEntry
     COMMAND_ACQUISITION_START = 0x70000bb9                  # The command for starts the acquisition of images
     COMMAND_ACQUISITION_STOP = 0x70000bba                   # The command for stop the acquisition of images
-    INT_ACQUISITION_SPEED_LEVEL = 0x10000bbb                # (Only U2Device)The level for acquisition speed
-    INT_ACQUISITION_FRAME_COUNT = 0x10000bbc                # (Only U2Device)Number of frames to acquire in MultiFrame Acquisition mode.
-    ENUM_TRIGGER_MODE = 0x30000bbd                          # Trigger mode switch
+    INT_ACQUISITION_SPEED_LEVEL = 0x10000bbb                # The level for acquisition speed
+    INT_ACQUISITION_FRAME_COUNT = 0x10000bbc
+    ENUM_TRIGGER_MODE = 0x30000bbd                          # Trigger mode, Reference:GxTriggerModeEntry
     COMMAND_TRIGGER_SOFTWARE = 0x70000bbe                   # The command for generates a software trigger signal
     ENUM_TRIGGER_ACTIVATION = 0x30000bbf                    # Trigger polarity, Reference GxTriggerActivationEntry
-    ENUM_TRIGGER_SWITCH = 0x30000bc0                        # (Only U2Device)The switch of External trigger
+    ENUM_TRIGGER_SWITCH = 0x30000bc0                        # The switch of External trigger
     FLOAT_EXPOSURE_TIME = 0x20000bc1                        # Exposure time
     ENUM_EXPOSURE_AUTO = 0x30000bc2                         # Exposure auto
     FLOAT_TRIGGER_FILTER_RAISING = 0x20000bc3               # The Value of rising edge triggered filter
@@ -309,72 +171,55 @@ class GxFeatureID:
     ENUM_TRANSFER_OPERATION_MODE = 0x30000bca               # The operation method for the transfers, Reference GxTransferOperationModeEntry
     COMMAND_TRANSFER_START = 0x70000bcb                     # Starts the streaming of data blocks out of the device
     INT_TRANSFER_BLOCK_COUNT = 0x10000bcc                   # The number of data Blocks that the device should stream before stopping
-    BOOL_FRAMESTORE_COVER_ACTIVE = 0x40000bcd               # The switch for frame cover
+    BOOL_FRAME_STORE_COVER_ACTIVE = 0x40000bcd              # The switch for frame cover
     ENUM_ACQUISITION_FRAME_RATE_MODE = 0x30000bce           # The switch for Control frame rate
     FLOAT_ACQUISITION_FRAME_RATE = 0x20000bcf               # The value for Control frame rate
     FLOAT_CURRENT_ACQUISITION_FRAME_RATE = 0x20000bd0       # The maximum allowed frame acquisition rate
     ENUM_FIXED_PATTERN_NOISE_CORRECT_MODE = 0x30000bd1      # The switch of fixed pattern noise correct
     INT_ACQUISITION_BURST_FRAME_COUNT = 0x10000bd6          # The acquisition burst frame count
-    ENUM_ACQUISITION_STATUS_SELECTOR = 0x30000bd7           # The selector of acquisition status, reference GxAcquisitionStatusSelectorEntry
+    ENUM_ACQUISITION_STATUS_SELECTOR = 0x30000bd7           # The selector of acquisition status
     BOOL_ACQUISITION_STATUS = 0x40000bd8                    # The acquisition status
     FLOAT_EXPOSURE_DELAY = 0x2000765c                       # The exposure delay
-    FLOAT_EXPOSURE_OVERLAP_TIME_MAX = 0x2000765d            # Maximum overlap exposure time
-    ENUM_EXPOSURE_TIME_MODE = 0x3000765e                    # Exposure time mode, reference GxExposureTimeModeEntry
-    INT_FRAME_BUFFER_COUNT = 0x10004651                     # Frame memory depth
-    COMMAND_FRAME_BUFFER_FLUSH = 0x70004652                 # Empty the frame save
-    ENUM_ACQUISITION_BURST_MODE = 0x3000765F                # Burst acquisition mode
-    ENUM_OVERLAP_MODE = 0x30007660                          # overlap mode
-    ENUM_MULTISOURCE_SELECTOR = 0x30007661                  # MultiSourceSelector
-    BOOL_MULTISOURCE_ENABLE = 0x40007662                    # MultiSource Trigger Enable
-    BOOL_TRIGGER_CACHE_ENABLE = 0x40007663                  # Trigger Cache Enable
 
     # ----------------DigitalIO Section-----------------------------------
     ENUM_USER_OUTPUT_SELECTOR = 0x30000fa0                  # selects user settable output signal, Reference GxUserOutputSelectorEntry
     BOOL_USER_OUTPUT_VALUE = 0x40000fa1                     # The state of the output signal
-    ENUM_USER_OUTPUT_MODE = 0x30000fa2                      # (Only U2Device)UserIO output mode, Reference GxUserOutputModeEntry
-    ENUM_STROBE_SWITCH = 0x30000fa3                         # (Only U2Device)Strobe switch
+    ENUM_USER_OUTPUT_MODE = 0x30000fa2                      # UserIO output mode, Reference GxUserOutputModeEntry
+    ENUM_STROBE_SWITCH = 0x30000fa3                         # Strobe switch
     ENUM_LINE_SELECTOR = 0x30000fa4                         # Line selector, Reference GxLineSelectorEntry
     ENUM_LINE_MODE = 0x30000fa5                             # Line mode, Reference GxLineModeEntry
     BOOL_LINE_INVERTER = 0x40000fa6                         # Pin level reversal
     ENUM_LINE_SOURCE = 0x30000fa7                           # line source, Reference GxLineSourceEntry
     BOOL_LINE_STATUS = 0x40000fa8                           # line status
     INT_LINE_STATUS_ALL = 0x10000fa9                        # all line status
-    FLOAT_PULSE_WIDTH = 0x20000faa                          # IO pulse width
-    INT_LINE_RANGE = 0x10000fab                             # flash line ragne
-    INT_LINE_DELAY = 0x10000fac                             # flash line delay
-    INT_LINE_FILTER_RAISING_EDGE = 0x10000fad               # Pin rising edge filtering
-    INT_LINE_FILTER_FALLING_EDGE = 0x10000fae               # Pin falling edge filtering
+    FLOAT_PULSE_WIDTH = 0x20000faa                          #
 
     # ----------------AnalogControls Section------------------------------
-    ENUM_GAIN_AUTO = 0x30001388                             # gain auto, Reference GxAutoEntry
+    ENUM_GAIN_AUTO = 0x30001388                             # gain auto, Reference GxGainAutoEntry
     ENUM_GAIN_SELECTOR = 0x30001389                         # selects gain channel, Reference GxGainSelectorEntry
-    ENUM_BLACK_LEVEL_AUTO = 0x3000138b                      # Black level auto, Reference GxAutoEntry
+    ENUM_BLACK_LEVEL_AUTO = 0x3000138b                      # Black level auto, Reference GxBlackLevelAutoEntry
     ENUM_BLACK_LEVEL_SELECTOR = 0x3000138c                  # Black level channel, Reference GxBlackLevelSelectEntry
-    ENUM_BALANCE_WHITE_AUTO = 0x3000138e                    # Balance white auto, Reference GxAutoEntry
+    ENUM_BALANCE_WHITE_AUTO = 0x3000138e                    # Balance white auto, Reference GxBalanceWhiteAutoEntry
     ENUM_BALANCE_RATIO_SELECTOR = 0x3000138f                # selects Balance white channel, Reference GxBalanceRatioSelectorEntry
     FLOAT_BALANCE_RATIO = 0x20001390                        # Balance white channel ratio
-    ENUM_COLOR_CORRECT = 0x30001391                         # Color correct switch
-    ENUM_DEAD_PIXEL_CORRECT = 0x30001392                    # Pixel correct switch
-    FLOAT_GAIN = 0x20001393                                 # gain value
-    FLOAT_BLACK_LEVEL = 0x20001394                          # Black level value
+    ENUM_COLOR_CORRECT = 0x30001391                         # Color correct, Reference GxColorCorrectEntry
+    ENUM_DEAD_PIXEL_CORRECT = 0x30001392                    # Pixel correct, Reference GxDeadPixelCorrectEntry
+    FLOAT_GAIN = 0x20001393                                 # gain
+    FLOAT_BLACK_LEVEL = 0x20001394                          # Black level
     BOOL_GAMMA_ENABLE = 0x40001395                          # Gamma enable bit
-    ENUM_GAMMA_MODE = 0x30001396                            # Gamma mode, reference GxGammaModeEntry
+    ENUM_GAMMA_MODE = 0x30001396                            # Gamma mode
     FLOAT_GAMMA = 0x20001397                                # The value of Gamma
-    INT_DIGITAL_SHIFT = 0x10001398                          # bit select
-    ENUM_LIGHT_SOURCE_PRESET = 0x30001399                   # Light source preset, Reference GxLightSourcePresetEntry
-    BOOL_BLACKLEVEL_CALIB_STATUS = 0x4000139a               # BlackLevelCalibStatus
-    INT_BLACKLEVEL_CALIB_VALUE = 0x1000139b                 # BlackLevelCalibValue
-    FLOAT_PGA_GAIN = 0x2000139c                             # PGAGain
+    INT_DIGITAL_SHIFT = 0x10001398                          #
 
     # ---------------CustomFeature Section--------------------------------
-    INT_ADC_LEVEL = 0x10001770                              # (Only U2Device)AD conversion level
-    INT_H_BLANKING = 0x10001771                             # (Only U2Device)Horizontal blanking
-    INT_V_BLANKING = 0x10001772                             # (Only U2Device)Vertical blanking
-    STRING_USER_PASSWORD = 0x50001773                       # (Only U2Device)User encrypted zone cipher
-    STRING_VERIFY_PASSWORD = 0x50001774                     # (Only U2Device)User encrypted zone check cipher
-    BUFFER_USER_DATA = 0x60001775                           # (Only U2Device)User encrypted area content
+    INT_ADC_LEVEL = 0x10001770                              # AD conversion level
+    INT_H_BLANKING = 0x10001771                             # Horizontal blanking
+    INT_V_BLANKING = 0x10001772                             # Vertical blanking
+    STRING_USER_PASSWORD = 0x50001773                       # User encrypted zone cipher
+    STRING_VERIFY_PASSWORD = 0x50001774                     # User encrypted zone check cipher
+    BUFFER_USER_DATA = 0x60001775                           # User encrypted area content
     INT_GRAY_VALUE = 0x10001776                             # Expected gray value
-    ENUM_AA_LIGHT_ENVIRONMENT = 0x30001777                  # (Only U2Device)Gain auto, Exposure auto, Light environment type,
+    ENUM_AA_LIGHT_ENVIRONMENT = 0x30001777                  # Gain auto, Exposure auto, Light environment type,
                                                             # Reference GxAALightEnvironmentEntry
     INT_AAROI_OFFSETX = 0x10001778                          # The X offset for the rect of interest in pixels for 2A
     INT_AAROI_OFFSETY = 0x10001779                          # The Y offset for the rect of interest in pixels for 2A
@@ -384,76 +229,29 @@ class GxFeatureID:
     FLOAT_AUTO_GAIN_MAX = 0x2000177d                        # Automatic gain maximum
     FLOAT_AUTO_EXPOSURE_TIME_MIN = 0x2000177e               # Automatic exposure minimum
     FLOAT_AUTO_EXPOSURE_TIME_MAX = 0x2000177f               # Automatic exposure maximum
-    BUFFER_FRAME_INFORMATION = 0x60001780                   # (Only U2Device)Image frame information
+    BUFFER_FRAME_INFORMATION = 0x60001780                   # Image frame information
     INT_CONTRAST_PARAM = 0x10001781                         # Contrast parameter
     FLOAT_GAMMA_PARAM = 0x20001782                          # Gamma parameter
     INT_COLOR_CORRECTION_PARAM = 0x10001783                 # Color correction param
-    ENUM_IMAGE_GRAY_RAISE_SWITCH = 0x30001784               # (Only U2Device)Image gray raise switch
+    ENUM_IMAGE_GRAY_RAISE_SWITCH = 0x30001784               # Image gray raise, Reference GxImageGrayRaiseSwitchEntry
     ENUM_AWB_LAMP_HOUSE = 0x30001785                        # Automatic white balance light source
                                                             # Reference GxAWBLampHouseEntry
     INT_AWBROI_OFFSETX = 0x10001786                         # Offset_X of automatic white balance region
     INT_AWBROI_OFFSETY = 0x10001787                         # Offset_Y of automatic white balance region
     INT_AWBROI_WIDTH = 0x10001788                           # Width of automatic white balance region
     INT_AWBROI_HEIGHT = 0x10001789                          # Height of automatic white balance region
-    ENUM_SHARPNESS_MODE = 0x3000178a                        # Sharpness switch
-    FLOAT_SHARPNESS = 0x2000178b                            # Sharpness value
-    ENUM_USER_DATA_FIELD_SELECTOR = 0x3000178c              # User selects the flash data field
-                                                            # Reference GxUserDataFieldSelectorEntry for area selection
-    BUFFER_USER_DATA_FIELD_VALUE = 0x6000178d               # User data field content
-    ENUM_FLAT_FIELD_CORRECTION = 0x3000178e                 # Flat field correction switch
-    ENUM_NOISE_REDUCTION_MODE = 0x3000178f                  # Noise reduction switch
-    FLOAT_NOISE_REDUCTION = 0x20001790                      # Noise reduction value
-    BUFFER_FFCLOAD = 0x60001791                             # Get flat field correction parameters
-    BUFFER_FFCSAVE = 0x60001792                             # Set flat field correction parameters
-    ENUM_STATIC_DEFECT_CORRECTION = 0x30001793              # Static dead pixel correction switch
-
-    ENUM_2D_NOISE_REDUCTION_MODE = 0x30001794               # 2d noise reduction mode
-    ENUM_3D_NOISE_REDUCTION_MODE = 0x30001795               # 3d noise reduction mode
-    COMMAND_CLOSE_ISP = 0x70001796                          # Close ISP
-    BUFFER_STATIC_DEFECT_CORRECTION_VALUE_ALL = 0x60001797  # static defect conrrection value
-    BUFFER_STATIC_DEFECT_CORRECTION_FLASH_VALUE = 0x60001798  # static defect conrrection flash value
-    INT_STATIC_DEFECT_CORRECTION_FINISH = 0x10001799        # static defect conrrection finish
-    BUFFER_STATIC_DEFECT_CORRECTION_INFO = 0x6000179a       # static defect conrrection Info
-    COMMAND_STRIP_CALIBRATION_START = 0x7000179b            # Starts the strip calibration
-    COMMAND_STRIP_CALIBRATION_STOP = 0x7000179c             # Ready to stop the strip calibration
-    BUFFER_USER_DATA_FILED_VALUE_ALL = 0x6000179d           # Continuous user area content
-    ENUM_SHADING_CORRECTION_MODE = 0x3000179e
-    COMMAND_FFC_GENERATE = 0x7000179f                       # Generate flat field correction factor
-    ENUM_FFC_GENERATE_STATUS = 0x700017a0                   # Level-field correction status
-    ENUM_FFC_EXPECTED_GRAY_VALUE_ENABLE = 0x700017a1        # Level-field correction expected gray value enable
-    INT_FFC_EXPECTED_GRAY = 0x100017a2                      # Flat-field correction expected gray value
-    INT_FFC_COEFFICIENTS_SIZE = 0x100017a3                  # Level-field correction factor size
-    BUFFER_FFC_VALUE_ALL = 0x600017a4                       # Level-field correction value
-    ENUM_DSNU_SELECTOR = 0x700017a5                         # Selection of dark field correction coefficient
-    COMMAND_DSNU_GENERATE = 0x700017a6                      # Generate dark field correction factor
-    ENUM_DSNU_GENERATE_STATUS = 0x700017a7                  # Dark field correction status
-    COMMAND_DSNU_SAVE = 0x700017a8                          # Save dark-field correction factor
-    COMMAND_DSNU_LOAD = 0x700017a9                          # Load dark-field correction factor
-    ENUM_PRNU_SELECTOR = 0x700017aa                         # Selection of bright field correction coefficient
-    COMMAND_PRNU_GENERATE = 0x700017ab                      # Generate bright field correction factor
-    ENUM_PRNU_GENERATE_STATUS = 0x700017ac                  # Bright-field correction status
-    COMMAND_PRNU_SAVE = 0x700017ad                          # Save the bright field correction factor
-    COMMAND_PRNU_LOAD = 0x700017ae                          # Loaded open field correction factor
-    BUFFER_DATA_FIELD_VALUE_ALL = 0x600017bf                # Data field value
-    INT_STATIC_DEFECT_CORRECTION_CALIB_STATUS = 0x100017b0  # Static bad point calibration status
-    INT_FFC_FACTORY_STATUS = 0x100017b1                     # Level-field correction status detection
-    INT_DSNU_FACTORY_STATUS = 0x100017b2                    # Detection of dark-field correction state
-    INT_PRNU_FACTORY_STATUS = 0x100017b3                    # Open field correction state detection
-    BUFFER_DETECT = 0x100017b4                              # Buffer detection（CXP）
-    ENUM_FFC_COEFFICIENT = 0x700017b5                       # Selection of flat field correction coefficient
-    BUFFER_FFCFLASH_LOAD = 0x700017b6                       # Load the flat field correction coefficient
-    BUFFER_FFCFLASH_SAVE = 0x700017b7                       # Save the flat field correction coefficient
+    ENUM_SHARPNESS_MODE = 0x3000178a                        # Sharpness mode, Reference GxSharpnessModeEntry
+    FLOAT_SHARPNESS = 0x2000178b                            # Sharpness
 
     # ---------------UserSetControl Section-------------------------------
-    ENUM_USER_SET_SELECTOR = 0x30001b58                     # Parameter group selection, Reference GxUserSetEntry
+    ENUM_USER_SET_SELECTOR = 0x30001b58                     # Parameter group selection, Reference GxUserSetSelectorEntry
     COMMAND_USER_SET_LOAD = 0x70001b59                      # Load parameter group
     COMMAND_USER_SET_SAVE = 0x70001b5a                      # Save parameter group
-    ENUM_USER_SET_DEFAULT = 0x30001b5b                      # Startup parameter group, Reference GxUserSetEntry
-    INT_DATA_FIELD_VALUE_ALL_USED_STATUS = 0x10001b5c       # Factory status of user data area
+    ENUM_USER_SET_DEFAULT = 0x30001b5b                      # Startup parameter group, Reference GxUserSetDefaultEntry
 
     # ---------------Event Section----------------------------------------
     ENUM_EVENT_SELECTOR = 0x30001f40                        # Event source select, Reference GxEventSelectorEntry
-    ENUM_EVENT_NOTIFICATION = 0x30001f41                    # Switch of the notification to the host application of the occurrence of the selected Event.
+    ENUM_EVENT_NOTIFICATION = 0x30001f41                    # Event enabled, Reference GxEventNotificationEntry
     INT_EVENT_EXPOSURE_END = 0x10001f42                     # Exposure end event
     INT_EVENT_EXPOSURE_END_TIMESTAMP = 0x10001f43           # The timestamp of Exposure end event
     INT_EVENT_EXPOSURE_END_FRAME_ID = 0x10001f44            # The frame id of Exposure end event
@@ -467,19 +265,6 @@ class GxFeatureID:
     INT_EVENT_BLOCK_NOT_EMPTY_TIMESTAMP = 0x10001f4c        # The timestamp of frame memory not empty event
     INT_EVENT_INTERNAL_ERROR = 0x10001f4d                   # Internal erroneous event
     INT_EVENT_INTERNAL_ERROR_TIMESTAMP = 0x10001f4e         # The timestamp of internal erroneous event
-    INT_EVENT_FRAMEBURSTSTART_OVERTRIGGER = 0x10001f4f      # Frame burst start overtrigger event ID
-    INT_EVENT_FRAMEBURSTSTART_OVERTRIGGER_FRAMEID = 0x10001f50   # Frame burst start overtrigger event frame ID
-    INT_EVENT_FRAMEBURSTSTART_OVERTRIGGER_TIMESTAMP = 0x10001f51 # Frame burst start overtrigger event timestamp
-    INT_EVENT_FRAMESTART_WAIT = 0x10001f52                  # Frame start wait event ID
-    INT_EVENT_FRAMESTART_WAIT_TIMESTAMP = 0x10001f53        # Frame start wait event timestamp
-    INT_EVENT_FRAMEBURSTSTART_WAIT = 0x10001f54             # Frame burst start wait event ID
-    INT_EVENT_FRAMEBURSTSTART_WAIT_TIMESTAMP = 0x10001f55   # Frame burst start wait event timestamp
-    INT_EVENT_BLOCK_DISCARD_FRAMEID= 0x10001f56             # Data block discard event frame ID
-    INT_EVENT_FRAMESTART_OVERTRIGGER_FRAMEID = 0x10001f57   # Frame start wait overtrigger event frame ID
-    INT_EVENT_BLOCK_NOT_EMPTY_FRAMEID = 0x10001f58          # Data block not empty event frame ID
-    INT_EVENT_FRAMESTART_WAIT_FRAMEID = 0x10001f59          # Frame start wait event frame ID
-    INT_EVENT_FRAMEBURSTSTART_WAIT_FRAMEID = 0x10001f5a     # Frame burst start wait event frame ID
-    ENUM_EVENT_SIMPLE_MODE = 0x30001f5b                     # event block ID enable
 
     # ---------------LUT Section------------------------------------------
     ENUM_LUT_SELECTOR = 0x30002328                          # Select lut, Reference GxLutSelectorEntry
@@ -487,20 +272,17 @@ class GxFeatureID:
     BOOL_LUT_ENABLE = 0x4000232a                            # Lut enable bit
     INT_LUT_INDEX = 0x1000232b                              # Lut index
     INT_LUT_VALUE = 0x1000232c                              # Lut value
-    INT_LUT_FACTORY_STATUS = 0x1000232d                     # Lookup table factory status
+
+    # ---------------Color Transformation Control-------------------------
+    ENUM_COLOR_TRANSFORMATION_MODE = 0x30002af8             # Color transformation mode
+    BOOL_COLOR_TRANSFORMATION_ENABLE = 0x40002af9           # Color transformation enable bit
+    ENUM_COLOR_TRANSFORMATION_VALUE_SELECTOR = 0x30002afa   # The selector of color transformation value
+    FLOAT_COLOR_TRANSFORMATION_VALUE = 0x20002afb           # The value of color transformation
 
     # ---------------ChunkData Section------------------------------------
     BOOL_CHUNK_MODE_ACTIVE = 0x40002711                     # Enable frame information
     ENUM_CHUNK_SELECTOR = 0x30002712                        # Select frame information channel, Reference GxChunkSelectorEntry
     BOOL_CHUNK_ENABLE = 0x40002713                          # Enable single frame information channel
-
-    # ---------------Color Transformation Control-------------------------
-    ENUM_COLOR_TRANSFORMATION_MODE = 0x30002af8             # Color transformation mode, Reference GxColorTransformationModeEntry
-    BOOL_COLOR_TRANSFORMATION_ENABLE = 0x40002af9           # Color transformation enable bit
-    ENUM_COLOR_TRANSFORMATION_VALUE_SELECTOR = 0x30002afa   # The selector of color transformation value, Reference GxColorTransformationValueSelectorEntry
-    FLOAT_COLOR_TRANSFORMATION_VALUE = 0x20002afb           # The value of color transformation
-    ENUM_SATURATION_MODE = 0x30002afc                       # Saturation switch
-    INT_SATURATION = 0x10002afd                             # Saturation value
 
     # ---------------CounterAndTimerControl Section-----------------------
     ENUM_TIMER_SELECTOR = 0x30002ee0                        # Selects which Counter to configure, Refer to GxTimerSelectorEntry
@@ -512,101 +294,10 @@ class GxFeatureID:
     ENUM_COUNTER_RESET_SOURCE = 0x30002ee6                  # Selects the signals that will be the source to reset the Counter, Refer to GxCounterResetSourceEntry
     ENUM_COUNTER_RESET_ACTIVATION = 0x30002ee7              # Selects the Activation mode of the Counter Reset Source signal, Refer to GxCounterResetActivationEntry
     COMMAND_COUNTER_RESET = 0x70002ee8                      # Does a software reset of the selected Counter and starts it.
-    ENUM_COUNTER_TRIGGER_SOURCE = 0x30002ee9                # Counter trigger source, Reference GxCounterTriggerSourceEntry
-    INT_COUNTER_DURATION = 0x10002eea                       # Counter duration value
-    ENUM_TIMER_TRIGGER_ACTIVATION = 0x30002eeb              # Timer Trigger Activation, reference GxTimerTriggerActivationEntry
-    INT_COUNTER_VALUE = 0x10002eec                          # counter value
-
-    # ---------------RemoveParameterLimitControl Section------------------
-    ENUM_REMOVE_PARAMETER_LIMIT = 0x300032c8                # Remove paremeter range restriction switch
-
-    # ---------------HDRControl Section-----------------------------------
-    ENUM_HDR_MODE = 0x300036b0                              # HDR switch
-    INT_HDR_TARGET_LONG_VALUE = 0x100036b1                  # Bright field expectations
-    INT_HDR_TARGET_SHORT_VALUE = 0x100036b2                 # dark field expectations
-    INT_HDR_TARGET_MAIN_VALUE = 0x100036b3                  # Convergence expectations
-
-    # ---------------MultiGrayControl Section-----------------------------------
-    ENUM_MGC_MODE = 0x30003a99                              # Multi-frame grey scale control mode
-    INT_MGC_SELECTOR = 0x10003a9a                           # Multiframe grey color selection
-    FLOAT_MGC_EXPOSURE_TIME = 0x20003a9b                    # Multi-frame grey time exposure time
-    FLOAT_MGC_GAIN = 0x20003a9c                             # Multiframe grey gain
-
-    # ---------------ImageQualityControl Section-----------------------------------
-    BUFFER_STRIPED_CALIBRATION_INFO = 0x60003e81            # Fringe calibration information
-    FLOAT_CONTRAST = 0x20003e82                             # Contrast
-    ENUM_HOTPIXEL_CORRECTION = 0x30003e83                   # Hotpixel correction
-
-    # ---------------GyroControl Section-----------------------------------
-    BUFFER_IMU_DATA = 0x60004269                            # IMU data
-    ENUM_IMU_CONFIG_ACC_RANGE = 0x3000426a                  # IMU config acc range
-    ENUM_IMU_CONFIG_ACC_ODR_LOW_PASS_FILTER_SWITCH = 0x3000426b  # IMU config acc odr low pass filter switch
-    ENUM_IMU_CONFIG_ACC_ODR = 0x3000426c                    # IMU config acc odr
-    ENUM_IMU_CONFIG_ACC_ODR_LOW_PASS_FILTER_FREQUENCY = 0x3000426d  # imu config acc odr low pass filter frequency
-    ENUM_IMU_CONFIG_GYRO_XRANGE = 0x3000426f                # imu config gyro Xrange
-    ENUM_IMU_CONFIG_GYRO_YRANGE = 0x30004270                # imu config gyro Yrange
-    ENUM_IMU_CONFIG_GYRO_ZRANGE = 0x30004271                # imu config gyro Zrange
-    ENUM_IMU_CONFIG_GYRO_ODR_LOW_PASS_FILTER_SWITCH = 0x30004272  # imu config gyro odr low pass filter switch
-    ENUM_IMU_CONFIG_GYRO_ODR = 0x30004273                   # imu config gyro odr
-    ENUM_IMU_CONFIG_GYRO_ODR_LOW_PASS_FILTER_FREQUENCY = 0x30004274  # imu config gyro odr low pass filter frequency
-    FLOAT_IMU_ROOM_TEMPERATURE = 0x20004275                 # imu room temperature
-    ENUM_IMU_TEMPERATURE_ODR = 0x30004276                   # imu temperature odr
-
-    # ---------------SerialPortControl Section-----------------------------------
-    ENUM_SERIALPORT_SELECTOR = 0x30004a39                   # Serial port selection
-    ENUM_SERIALPORT_SOURCE = 0x30004a3a                     # Serial port input source
-    ENUM_SERIALPORT_BAUDRATE = 0x30004a3b                   # Serial baud rate
-    INT_SERIALPORT_DATA_BITS = 0x10004a3c                   # Serial port data bit
-    ENUM_SERIALPORT_STOP_BITS = 0x30004a3d                  # Serial port stop bit
-    ENUM_SERIALPORT_PARITY = 0x30004a3e                     # Serial port parity
-    INT_TRANSMIT_QUEUE_MAX_CHARACTER_COUNT = 0x10004a3f     # Maximum number of characters in transmission queue
-    INT_TRANSMIT_QUEUE_CURRENT_CHARACTER_COUNT = 0x10004a40  # Current number of characters in the transmission queue
-    INT_RECEIVE_QUEUE_MAX_CHARACTER_COUNT = 0x10004a41      # Maximum number of characters in receive queue
-    INT_RECEIVE_QUEUE_CURRENT_CHARACTER_COUNT = 0x10004a42  # Current number of characters in the receive queue
-    INT_RECEIVE_FRAMING_ERROR_COUNT = 0x10004a43            # Received frame error count
-    INT_RECEIVE_PARITY_ERROR_COUNT = 0x10004a44             # Receive parity error count
-    COMMAND_RECEIVE_QUEUE_CLEAR = 0x70004a45                # Queue Clear
-    BUFFER_SERIALPORT_DATA = 0x60004a46                     # serial data
-    INT_SERIALPORT_DATA_LENGTH = 0x10004a47                 # Serial port data length
-    INT_SERIAL_PORT_DETECTION_STATUS = 0x10004a48           # Serial port status detection
-
-    # ---------------CoaXPress Section-------------------------------------------
-    ENUM_CXP_LINK_CONFIGURATION = 0x30004e21                # Connection configuration
-    ENUM_CXP_LINK_CONFIGURATION_PREFERRED = 0x30004e22      # Preset connection configuration
-    ENUM_CXP_LINK_CONFIGURATION_STATUS = 0x30004e23         # CXP connection configuration status
-    INT_IMAGE1_STREAM_ID = 0x10004e24                       # First image flow ID
-    ENUM_CXP_CONNECTION_SELECTOR = 0x30004e25               # Connection selection
-    ENUM_CXP_CONNECTION_TEST_MODE = 0x30004e26              # Connection test mode
-    INT_CXP_CONNECTION_TEST_ERROR_COUNT = 0x10004e27        # Connection test error count
-    INT_CXP_CONNECTION_TEST_PACKET_RX_COUNT = 0x10004e28    # Number of connection test packets received
-    INT_CXP_CONNECTION_TEST_PACKET_TX_COUNT = 0x10004e29    # Number of connection test packets sent
-
-    # ---------------SequencerControl Section-----------------------------------
-    ENUM_SEQUENCER_MODE = 0x30005209                        # Sequencer mode
-    ENUM_SEQUENCER_CONFIGURATION_MODE = 0x3000520a          # Sequencer configuration mode
-    ENUM_SEQUENCER_FEATURE_SELECTOR = 0x3000520b            # Sequencer function selector
-    BOOL_SEQUENCER_FEATURE_ENABLE = 0x4000520c              # Sequencer function enabled
-    INT_SEQUENCER_SET_SELECTOR = 0x1000520d                 # Sequencer setting selector
-    INT_SEQUENCER_SET_COUNT = 0x1000520e                    # Sequencer count
-    INT_SEQUENCER_SET_ACTIVE = 0x1000520f                   # Sequencer settings active
-    COMMAND_SEQUENCER_SET_RESET = 0x70005210                # Sequencer setting reset
-    INT_SEQUENCER_PATH_SELECTOR = 0x10005211                # Sequencer payh selection
-    INT_SEQUENCER_SET_NEXT = 0x10005212                     # Sequencer Next
-    ENUM_SEQUENCER_TRIGGER_SOURCE = 0x30005213              # Sequencer Trigger
-    COMMAND_SEQUENCER_SET_SAVE = 0x70005214                 # Sequencer Save
-    COMMAND_SEQUENCER_SET_LOAD = 0x70005215                 # Sequencer Load
-
-    # ---------------EnoderControl Section--------------------------------------
-    ENUM_ENCODER_SELECTOR = 0x300055f1                      # Encoder selector
-    ENUM_ENCODER_DIRECTION = 0x300055f2                     # Encoder direction
-    INT_ENCODER_VALUE = 0x100055f3                          # Decoder value
-    ENUM_ENCODER_SOURCEA = 0x300055f4                       # Encoder phase A input
-    ENUM_ENCODER_SOURCEB = 0x300055f5                       # Encoder phase B input
-    ENUM_ENCODER_MODE = 0x300055f6                          # Encoder Mode
 
     # ---------------Device Feature---------------------------------------
-    INT_COMMAND_TIMEOUT = 0x13000000                        # (Only GEVDevice)The time of command timeout
-    INT_COMMAND_RETRY_COUNT = 0x13000001                    # (Only GEVDevice)Command retry times
+    INT_COMMAND_TIMEOUT = 0x13000000                        # The time of command timeout
+    INT_COMMAND_RETRY_COUNT = 0x13000001                    # Command retry times
 
     # ---------------DataStream Feature-----------------------------------
     INT_ANNOUNCED_BUFFER_COUNT = 0x14000000                 # The number of Buffer declarations
@@ -614,24 +305,21 @@ class GxFeatureID:
     INT_LOST_FRAME_COUNT = 0x14000002                       # Number of lost frames caused by buffer deficiency
     INT_INCOMPLETE_FRAME_COUNT = 0x14000003                 # Number of residual frames received
     INT_DELIVERED_PACKET_COUNT = 0x14000004                 # The number of packets received
-    INT_RESEND_PACKET_COUNT = 0x14000005                    # (Only GEVDevice)Number of retransmission packages
-    INT_RESCUED_PACKET_COUNT = 0x14000006                   # (Only GEVDevice)Retransmission success package number
-    INT_RESEND_COMMAND_COUNT = 0x14000007                   # (Only GEVDevice)Retransmission command times
-    INT_UNEXPECTED_PACKET_COUNT = 0x14000008                # (Only GEVDevice)Exception packet number
-    INT_MAX_PACKET_COUNT_IN_ONE_BLOCK = 0x14000009          # (Only GEVDevice)Data block maximum retransmission number
-    INT_MAX_PACKET_COUNT_IN_ONE_COMMAND = 0x1400000a        # (Only GEVDevice)The maximum number of packets contained in one command
-    INT_RESEND_TIMEOUT = 0x1400000b                         # (Only GEVDevice)Retransmission timeout time
-    INT_MAX_WAIT_PACKET_COUNT = 0x1400000c                  # (Only GEVDevice)Maximum waiting packet number
-    ENUM_RESEND_MODE = 0x3400000d                           # (Only GEVDevice)Retransmission mode switch
-    INT_MISSING_BLOCK_ID_COUNT = 0x1400000e                 # (Only GEVDevice)BlockID lost number
-    INT_BLOCK_TIMEOUT = 0x1400000f                          # (Only GEVDevice)Data block timeout time
-    INT_STREAM_TRANSFER_SIZE = 0x14000010                   # (Only U3VDevice)Data block size
-    INT_STREAM_TRANSFER_NUMBER_URB = 0x14000011             # (Only U3VDevice)Number of data blocks
-    INT_MAX_NUM_QUEUE_BUFFER = 0x14000012                   # (Only GEVDevice)The maximum Buffer number of the collection queue
-    INT_PACKET_TIMEOUT = 0x14000013                         # (Only GEVDevice)Packet timeout time
-    INT_SOCKET_BUFFER_SIZE = 0x14000014                     # (Only GEVDevice)Socket buffer size in kilobytes
-    ENUM_STOP_ACQUISITION_MODE = 0x34000015                 # (Only U3VDevice)Stop acquisition mode Reference GxStopAcquisitionModeEntry
-    ENUM_STREAM_BUFFER_HANDLING_MODE = 0x34000016           # Buffer handling mode Reference GxDSStreamBufferHandlingModeEntry
+    INT_RESEND_PACKET_COUNT = 0x14000005                    # Number of retransmission packages
+    INT_RESCUED_PACKED_COUNT = 0x14000006                   # Retransmission success package number
+    INT_RESEND_COMMAND_COUNT = 0x14000007                   # Retransmission command times
+    INT_UNEXPECTED_PACKED_COUNT = 0x14000008                # Exception packet number
+    INT_MAX_PACKET_COUNT_IN_ONE_BLOCK = 0x14000009          # Data block maximum retransmission number
+    INT_MAX_PACKET_COUNT_IN_ONE_COMMAND = 0x1400000a        # The maximum number of packets contained in one command
+    INT_RESEND_TIMEOUT = 0x1400000b                         # Retransmission timeout time
+    INT_MAX_WAIT_PACKET_COUNT = 0x1400000c                  # Maximum waiting packet number
+    ENUM_RESEND_MODE = 0x3400000d                           # Retransmission mode, Reference GxDSResendModeEntry
+    INT_MISSING_BLOCK_ID_COUNT = 0x1400000e                 # BlockID lost number
+    INT_BLOCK_TIMEOUT = 0x1400000f                          # Data block timeout time
+    INT_STREAM_TRANSFER_SIZE = 0x14000010                   # Data block size
+    INT_STREAM_TRANSFER_NUMBER_URB = 0x14000011             # Number of data blocks
+    INT_MAX_NUM_QUEUE_BUFFER = 0x14000012                   # The maximum Buffer number of the collection queue
+    INT_PACKET_TIMEOUT = 0x14000013                         # Packet timeout time
 
     def __init__(self):
         pass
@@ -720,88 +408,7 @@ class GxFrameData(Structure):
     def __str__(self):
         return "GxFrameData\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
 
-class GxFrameBuffer(ctypes.Structure):
-    _fields_ = [
-        ('frame_id', c_ulonglong),              # The frame id of the image
-        ('timestamp', c_ulonglong),             # Time stamp of image
-        ('buf_id', c_ulonglong),                # Image buff ID
-        ('image_buf', c_void_p),                # Image buff address
-        ('status', c_uint),                     # The return state of the image
-        ('width', c_uint),                      # Image width
-        ('height', c_uint),                     # Image height
-        ('pixel_format', c_uint),               # Image PixFormat
-        ('image_size', c_uint),                 # Image data size, Including frame information
-        ('offset_x', c_uint),                   # X-direction offset of the image
-        ('offset_y', c_uint),                   # Y-direction offset of the image
-        ('reserved', c_uint),                   # Reserved
-    ]
 
-    def __str__(self):
-        return "GxFrameBuffer\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxIntFeatrue(Structure):
-    _fields_ = [
-        ('value', c_int64),
-        ('min', c_int64),
-        ('max', c_int64),
-        ('inc', c_int64),
-        ('reserved', c_int32*NODE_FEATURE_RESERVED_16),
-    ]
-    def __str__(self):
-        return "GxIntFeatrue\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxEnumValue(Structure):
-    _fields_ = [
-        ('cur_value'    ,   c_int64),                   # Enumerate subkey values
-        ('cur_symbolic' ,   c_char * 128),              # Enumeration sub item description
-        ('reserved'     ,   c_int32 * 4),               # Reserved
-    ]
-    def __str__(self):
-        return "GxEnumValue\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxEnumFeatrue( Structure):
-    _fields_ = [
-        ('cur_value'        ,   GxEnumValue),           # Current enumeration value
-        ('supported_number' ,   c_int64),               # Number of enumerated subitems
-        ('supported_value'  ,   GxEnumValue * 128),     # Info of enumerated subitems
-        ('reserved'         ,   c_int32 * 16),          # Reserved
-    ]
-    def __str__(self):
-        return "GxEnumFeatrue\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxFloatFeature( Structure):
-    _fields_ = [
-        ('cur_value'        ,   c_double),               # Float feature current value
-        ('min'              ,   c_double),               # Floating point minimum
-        ('max'              ,   c_double),               # Floating point max
-        ('inc'              ,   c_double),               # Floating point step size
-        ('inc_is_valid'     ,   c_bool),                # Whether the floating point step size is valid
-        ('unit'             ,   c_char * 8),            # Floating point units
-        ('reserved'         ,   c_int32 * 16),          # Reserved
-    ]
-    def __str__(self):
-        return "GxFloatFeature\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxStringFeature( Structure):
-    _fields_ = [
-        ('cur_value'    , c_char * 256),        # String feature current value
-        ('max_length'   , c_int64),             # String feature max length
-        ('reserved'     , c_int32 * 4),         # Reserved
-    ]
-    def __str__(self):
-        return "GxStringFeature\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-class GxRegisterStackEntry(Structure):
-     _fields_ = [
-         ('address',            c_ulonglong),     #Address of the register
-         ('buffer',             c_void_p),       #Pointer to the buffer containing the data
-         ('size',               c_uint),         #Number of bytes to read
-     ]
-
-     def __str__(self):
-         return "GxRegisterStackEntry\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-# The following structures have been abandoned
 class GxIntRange(Structure):
     _fields_ = [
         ('min',                 c_ulonglong),
@@ -838,44 +445,6 @@ class GxEnumDescription(Structure):
     def __str__(self):
         return "GxEnumDescription\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
 
-class GxRegisterStackEntry(Structure):
-     _fields_ = [
-         ('address',            c_ulonglong),     #Address of the register
-         ('buffer',             c_void_p),       #Pointer to the buffer containing the data
-         ('size',               c_uint),         #Number of bytes to read
-     ]
-
-     def __str__(self):
-         return "GxRegisterStackEntry\n%s" % "\n".join("%s:\t%s" % (n, getattr(self, n[0])) for n in self._fields_)
-
-if hasattr(dll, 'GXSetLogType'):
-    def gx_set_log_type(log_type):
-        """
-        :brief      Set whether logs of the specified type can be sent
-        :param      log_type:           log type,See detail in GxLogTypeList
-                                        Type: Int
-        :return:    status:             State return value, See detail in GxStatusList
-        """
-        log_type_c = c_uint()
-        log_type_c.value = log_type
-
-        status = dll.GXSetLogType(log_type)
-
-        return status
-
-if hasattr(dll, 'GXGetLogType'):
-    def gx_get_log_type():
-        """
-        :brief      Gets whether logs of a specified type can be sent
-        :param      log_type:           log type,See detail in GxLogTypeList
-                                        Type: Int
-        :return:    status:             State return value, See detail in GxStatusList
-        """
-        log_type_c = c_uint()
-
-        status = dll.GXGetLogType(byref(log_type_c))
-
-        return status,log_type_c.value
 
 if hasattr(dll, 'GXInitLib'):
     def gx_init_lib():
@@ -950,70 +519,6 @@ if hasattr(dll, 'GXUpdateAllDeviceList'):
         status = dll.GXUpdateAllDeviceList(byref(device_num), time_out_c)
         return status, device_num.value
 
-if hasattr(dll, 'GXUpdateAllDeviceListEx'):
-    def gx_update_device_list_ex(device_type,time_out=2000):
-        """
-        :brief      Enumerating all available ntype type devices.
-        :param      ntype:              enumerat ntype type device
-        :param      time_out:           The timeout time of enumeration (unit: ms).
-                                        Type: Int, Minimum:0
-        :return:    status:             State return value, See detail in GxStatusList
-                    device_num:         The number of devices
-        """
-        device_type_c = c_uint()
-        device_type_c.value = device_type
-
-        time_out_c = c_uint()
-        time_out_c.value = time_out
-
-        device_num = c_uint()
-        status = dll.GXUpdateAllDeviceListEx(device_type_c, byref(device_num), time_out_c)
-        return status, device_num.value
-
-if hasattr(dll, 'GXGetInterfaceNum'):
-    def gx_get_interface_number():
-        """
-        :brief      To get the basic information of all the devices
-        :return:    status:             State return value, See detail in GxStatusList
-                    interface_number_c:     The interface number
-        """
-        interface_number_c = c_size_t()
-        status = dll.GXGetInterfaceNum(byref(interface_number_c))
-        return status, interface_number_c.value
-
-if hasattr(dll, 'GXGetInterfaceInfo'):
-    def gx_get_interface_info(interface_num):
-        """
-        :brief      To get the basic information of all the devices
-        :param      interface_num:      The number of interface
-                                        Type: Int, Minimum: 0
-        :return:    status:             State return value, See detail in GxStatusList
-                    device_ip_info:     The structure pointer of the device information(GxDeviceIPInfo)
-        """
-        interface_info = GXInterfaceInfo()
-
-        buf_size_c = c_size_t()
-        buf_size_c.value = interface_num
-
-        status = dll.GXGetInterfaceInfo(buf_size_c,byref(interface_info))
-        return status, interface_info
-
-if hasattr(dll, 'GXGetInterfaceHandle'):
-    def gx_get_interface_handle(interface_num):
-        """
-        :brief      To get the basic information of all the devices
-        :param      interface_num:      The number of interface
-                                        Type: Int, Minimum: 0
-        :return:    status:             State return value, See detail in GxStatusList
-                    handle_size_c:      The interface handle
-        """
-        index_c = c_uint()
-        index_c.value = interface_num
-
-        handle_size_c = c_void_p()
-
-        status = dll.GXGetInterfaceHandle(index_c, byref(handle_size_c))
-        return status, handle_size_c.value
 
 if hasattr(dll, 'GXGetAllDeviceBaseInfo'):
     def gx_get_all_device_base_info(devices_num):
@@ -1096,673 +601,7 @@ if hasattr(dll, 'GXCloseDevice'):
         status = dll.GXCloseDevice(handle_c)
         return status
 
-
-if hasattr(dll, 'GXGetParentInterfaceFromDev'):
-    def gx_get_parent_interface_from_device(handle):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The device handle that the user specified to close.
-                                Type: Long, Greater than 0
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        interface_handle_c = c_void_p()
-
-        status = dll.GXGetParentInterfaceFromDev(handle_c, byref(interface_handle_c))
-        return status, interface_handle_c.value
-
-
-if hasattr(dll, 'GXGetLocalDeviceHandleFromDev'):
-    def gx_local_device_handle_from_device(handle):
-        """
-        :brief      Get device local layer handle
-        :param      handle:     The device handle
-        :return:    status:     State return value, See detail in GxStatusList
-                                device local layer handle
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        local_device_handle_c = c_void_p()
-
-        status = dll.GXGetLocalDeviceHandleFromDev(handle_c, byref(local_device_handle_c))
-        return status, local_device_handle_c.value
-
-
-if hasattr(dll, 'GXGetDataStreamNumFromDev'):
-    def gx_data_stream_number_from_device(handle):
-        """
-        :brief      Get device stream number
-        :param      handle:     The device handle that the user specified to get stream number.
-                                Type: Long, Greater than 0
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        stream_number = c_uint32()
-
-        status = dll.GXGetDataStreamNumFromDev(handle_c, byref( stream_number))
-        return status,stream_number.value
-
-
-if hasattr(dll, 'GXGetPayLoadSize'):
-    def gx_get_payload_size(handle):
-        """
-        :brief      Get device stream payload size
-        :param      handle:     The device stream layer payload size
-        :return:    status:     State return value, See detail in GxStatusList
-                                stream payload size
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        stream_payload_size = c_uint32()
-
-        status = dll.GXGetPayLoadSize(handle_c, byref( stream_payload_size))
-        return status,stream_payload_size.value
-
-
-if hasattr(dll, 'GXGetDataStreamHandleFromDev'):
-    def gx_get_data_stream_handle_from_device(handle,stream_index):
-        """
-        :brief      Get device stream handle
-        :param      handle:     The device handle that the user specified to get stream number.
-                                Type: Long, Greater than 0
-        :param      stream_index:stream index.
-        :return:    status:     State return value, See detail in GxStatusList
-                                stream handle
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        stream_number = c_uint32()
-        stream_number.value = stream_index
-        stream_handle_c = c_void_p()
-
-        status = dll.GXGetDataStreamHandleFromDev(handle_c, stream_number, byref(stream_handle_c))
-        return status, stream_handle_c.value
-
-
-if hasattr(dll, 'GXFeatureSave'):
-    def gx_feature_save(handle,file_path):
-        """
-        :brief      Save the current handle parameter of the camera to the configuration file.
-        :param      handle:     The handle of the device feature each layer
-                                Type: Long, Greater than 0
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        file_path_c = create_string_buffer(string_encoding(file_path))
-
-        status = dll.GXFeatureSave(handle_c, file_path_c)
-        return status
-
-
-if hasattr(dll, 'GXFeatureLoad'):
-    def gx_feature_load(handle, file_path, b_verify):
-        """
-        :brief      Load the configuration file for the camera
-        :param      handle:     The handle of the device feature each layer
-                                Type: Long, Greater than 0
-        :param      file_path:  The path that load user parameter group.
-                                Type: char*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        file_path_c = create_string_buffer(string_encoding(file_path))
-
-        b_verify_c = c_bool()
-        b_verify_c.value = b_verify
-
-        status = dll.GXFeatureLoad(handle_c,file_path,b_verify_c)
-        return status
-
-
-if hasattr(dll, 'GXGetNodeAccessMode'):
-    def gx_get_node_access_mode(handle, feature_name):
-        """
-        :brief      To get the access information of the feature node
-        :param      handle:         The handle that the device each layer
-                                    Type: Long, Greater than 0
-        :param      feature_name:   The feature_name that node feature name.
-                                    Type: char*
-        :return:    status:         State return value
-                                    feature node access mode
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        node_access_mode_c = c_int()
-        node_access_mode_c.value = GxNodeAccessMode.MODE_UNDEF
-
-        status = dll.GXGetNodeAccessMode(handle_c, feature_name_c, byref(node_access_mode_c))
-        return status,node_access_mode_c.value
-
-
-if hasattr(dll, 'GXGetIntValue'):
-    def gx_get_int_feature(handle, feature_name):
-        """
-        :brief      Get int type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                int feature info
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        int_feature_c = GxIntFeatrue()
-
-        status = dll.GXGetIntValue(handle_c,feature_name_c, byref(int_feature_c))
-        return status,int_feature_c
-
-
-if hasattr(dll, 'GXSetIntValue'):
-    def gx_set_int_feature_value(handle, feature_name, feature_value):
-        """
-        :brief      Set int type feature value
-        :param      handle:     TThe handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featrue_value:The feature node value.
-                                Type: int
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        feature_value_c = c_int64()
-        feature_value_c.value = feature_value
-
-        status = dll.GXSetIntValue(handle_c,feature_name_c, feature_value_c)
-        return status
-
-
-if hasattr(dll, 'GXGetEnumValue'):
-    def gx_get_enum_feature(handle, feature_name):
-        """
-        :brief      Get enum type feature info
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                enum info
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        enum_feature_c = GxEnumFeatrue()
-
-        status = dll.GXGetEnumValue(handle_c,feature_name_c, byref(enum_feature_c))
-        return status,enum_feature_c
-
-
-if hasattr(dll, 'GXSetEnumValue'):
-    def gx_set_enum_feature_value(handle, feature_name, featue_value):
-        """
-        :brief      Set enum type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featrue_value:The feature node value.
-                                Type: string
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        featue_value_c = c_int64()
-        featue_value_c.value = featue_value
-
-        status = dll.GXSetEnumValue(handle_c,feature_name_c, featue_value_c)
-        return status
-
-
-if hasattr(dll, 'GXSetEnumValueByString'):
-    def gx_set_enum_feature_value_string(handle, feature_name, feature_value):
-        """
-        :brief      Set enum type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featrue_value:The feature node value.
-                                Type: string
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        feature_value_c = create_string_buffer( string_encoding( feature_value))
-
-        status = dll.GXSetEnumValueByString(handle_c,feature_name_c, feature_value_c)
-        return status
-
-
-if hasattr(dll, 'GXGetFloatValue'):
-    def gx_get_float_feature(handle, feature_name):
-        """
-        :brief      Get float type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                float value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        float_feature_c = GxFloatFeature()
-
-        status = dll.GXGetFloatValue(handle_c,feature_name_c, byref(float_feature_c))
-        return status,float_feature_c
-
-
-if hasattr(dll, 'GXSetFloatValue'):
-    def gx_set_float_feature_value(handle, feature_name, featue_value):
-        """
-        :brief      Set float type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featrue_value:The feature node value.
-                                Type: float
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        featue_value_c = c_double()
-        featue_value_c.value = featue_value
-
-        status = dll.GXSetFloatValue(handle_c,feature_name_c, featue_value_c)
-        return status
-
-
-if hasattr(dll, 'GXGetBoolValue'):
-    def gx_get_bool_feature(handle, feature_name):
-        """
-        :brief      Get bool type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                bool value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        bool_feature_c = c_bool()
-
-        status = dll.GXGetBoolValue(handle_c,feature_name_c, byref(bool_feature_c))
-        return status,bool_feature_c.value
-
-
-if hasattr(dll, 'GXSetBoolValue'):
-    def gx_set_bool_feature_value(handle, feature_name, featue_value):
-        """
-        :brief      Set bool type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featue_value:The feature node value.
-                                Type: bool
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        featue_value_c = c_bool()
-        featue_value_c.value = featue_value
-
-        status = dll.GXSetBoolValue(handle_c,feature_name_c, featue_value)
-        return status
-
-
-if hasattr(dll, 'GXGetStringValue'):
-    def gx_get_string_feature(handle, feature_name):
-        """
-        :brief      Get string type feature info
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                string info
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        string_feature_c = GxStringFeature()
-
-        status = dll.GXGetStringValue(handle_c,feature_name_c, byref(string_feature_c))
-        return status,string_feature_c
-
-
-if hasattr(dll, 'GXSetStringValue'):
-    def gx_set_string_feature_value(handle, feature_name, featue_value):
-        """
-        :brief      Set string type feature value
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :param      featue_value:The feature node value.
-                                Type: char*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding( feature_name))
-        featue_value_c = create_string_buffer( string_encoding( featue_value))
-
-        status = dll.GXSetStringValue(handle_c,feature_name_c, featue_value_c)
-        return status
-
-
-if hasattr(dll, 'GXSetCommandValue'):
-    def gx_feature_send_command(handle, feature_name):
-        """
-        :brief      Send the command
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        status = dll.GXSetCommandValue(handle_c,feature_name_c)
-        return status
-
-
-if hasattr(dll, 'GXGetRegisterLength'):
-    def gx_get_register_feature_length(handle, feature_name):
-        """
-        :brief      Get register type feature length
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature node name.
-                                Type: char*
-        :return:    status:     State return value
-                                Feature length
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-        featue_value_c = c_size_t()
-
-        status = dll.GXGetRegisterLength(handle_c,feature_name_c, byref(featue_value_c))
-        return status,featue_value_c.value
-
-
-if hasattr(dll, 'GXGetRegisterValue'):
-    def gx_get_register_feature_value(handle, feature_name):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:The feature name.
-                                Type: char*
-        :return:    status:     State return value, See detail in GxStatusList
-                                Buffer data
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        feature_size_c = c_size_t()
-        status = dll.GXGetRegisterValue( handle_c, feature_name_c, None, byref( feature_size_c))
-
-        buff_c = (c_ubyte * feature_size_c.value)()
-
-        status = dll.GXGetRegisterValue(handle_c,feature_name_c, byref(buff_c), byref(feature_size_c))
-        return status,buff_c
-
-
-if hasattr(dll, 'GXSetRegisterValue'):
-    def gx_set_register_feature_value(handle, feature_name, buff, buff_size):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name: feature node name
-                                Type: char*
-        :param      buff:       Set user data
-                                Type: buffer*
-        :param      buff_size:  User data size
-                                Type: size_t*
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        featue_value_c = c_int64()
-        featue_value_c.value = buff_size
-
-        status = dll.GXSetRegisterValue(handle_c,feature_name_c, buff, featue_value_c)
-        return status
-
-
-if hasattr(dll, 'GXFeatureLoad'):
-    def gx_feature_load(handle, file_path, verify):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      file_path:  The path that load user parameter group.
-                                Type: char*
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        file_path_c = create_string_buffer(string_encoding(file_path))
-        verify_c = c_bool()
-        verify_c.value = verify
-
-        status = dll.GXFeatureLoad(handle_c,file_path_c, verify_c)
-        return status
-
-
-if hasattr(dll, 'GXFeatureSave'):
-    def gx_feature_save(handle, file_path):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      file_path:  The path that load user parameter group.
-                                Type: char*
-        :return:    status:     State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-        file_path_c = create_string_buffer(string_encoding(file_path))
-
-        status = dll.GXFeatureSave(handle_c,file_path_c)
-        return status
-
-
-if hasattr(dll, 'GXReadPort'):
-    def gx_read_port(handle, address, size):
-        """
-        :brief      Read data for user specified register.
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      address:    Register address
-                                Type: ulonglong
-        :param      buff:       Output data buff
-                                Type: int*
-        :param      size:       User data size
-                                Type: char*
-        :return:    status:     State return value, See detail in GxStatusList
-                    size:       Returns the length of the actual read register
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        address_c = c_ulonglong()
-        address_c.value = address
-
-        buff_c = c_int()
-
-        size_c = c_uint()
-        size_c.value = size
-
-        status = dll.GXReadPort(handle_c,address_c, byref( buff_c), byref( size_c))
-        return status, buff_c.value
-
-
-if hasattr(dll, 'GXWritePort'):
-    def gx_writer_port(handle, address, buff, size):
-        """
-        :brief      Writes user specified data to a user specified register.
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      address:    Register address
-                                Type: ulonglong
-        :param      buff:       User data
-                                Type: int*
-        :param      size:       User data size
-                                Type: char*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        address_c = c_ulonglong()
-        address_c.value = address
-
-        size_c = c_uint()
-        size_c.value = size
-
-        buff_c = c_int()
-        buff_c.value = buff
-
-        status = dll.GXWritePort(handle_c, address_c, byref(buff_c), byref(size_c))
-        return status
-
-
-if hasattr(dll, 'GXReadPortStacked'):
-    def gx_read_port_stacked(handle, entries, size):
-        """
-        :brief      Batch reads the value of the user-specified register (Registers with command values of 4 bytes only)
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      entries:    [in]Batch read register addresses and values
-                                [out]Read the data to the corresponding register
-                                Type: void*
-        :param      size:       [in]Read the number of device registers
-                                [out]The number of registers that were successfully read
-                                Type: size_t*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        size_c = c_uint()
-        size_c.value = size
-
-        status = dll.GXReadPortStacked(handle_c,entries, byref(size_c))
-        return status
-
-
-if hasattr(dll, 'GXWritePortStacked'):
-    def gx_writer_port_stacked(handle, entries, size):
-        """
-        :brief      Batch reads the value of the user-specified register (Registers with command values of 4 bytes only)
-        :param      handle:     [in]The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      entries:    [in]The address and value of the batch write register
-                                Type: void*
-        :param      size:       [in]Sets the number of device registers
-                                [out]The number of registers that were successfully written
-                                Type: size_t*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        size_c = c_uint()
-        size_c.value = size
-
-        status = dll.GXWritePortStacked(handle_c,entries, byref(size_c))
-        return status
-
-
-FEATURE_CALL = CFUNCTYPE(None, c_char_p, py_object)
-if hasattr(dll, 'GXRegisterFeatureCallbackByString'):
-    def gx_register_feature_call_back_by_string(handle, call_back, feature_name, args):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      file_path:  The path that load user parameter group.
-                                Type: char*
-        :return:    status:     State return value
-                                call back handle object
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        call_back_handle = c_void_p()
-
-        status = dll.GXRegisterFeatureCallbackByString(handle_c, ctypes.py_object(args), call_back, feature_name_c, byref(call_back_handle))
-        return status, call_back_handle.value
-
-
-if hasattr(dll, 'GXUnregisterFeatureCallbackByString'):
-    def gx_unregister_feature_call_back_by_string(handle, feature_name, call_back_handle):
-        """
-        :brief      Specify the device handle to close the device
-        :param      handle:     The handle of the device each layer.
-                                Type: Long, Greater than 0
-        :param      feature_name:  The feature name of the device each layer.
-                                Type: char*
-        :return:    status:     State return value
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        feature_name_c = create_string_buffer(string_encoding(feature_name))
-
-        call_back_handle_c = c_void_p()
-        call_back_handle_c.value = call_back_handle
-
-        status = dll.GXUnregisterFeatureCallbackByString(handle_c, feature_name_c, call_back_handle_c)
-        return status
-
-
-
+'''
 if hasattr(dll, 'GXGetDevicePersistentIpAddress'):
     def gx_get_device_persistent_ip_address(handle, ip_length=16, subnet_mask_length=16, default_gateway_length=16):
         """
@@ -1821,7 +660,7 @@ if hasattr(dll, 'GXSetDevicePersistentIpAddress'):
         status = dll.GXSetDevicePersistentIpAddress(handle_c, byref(ip_c), byref(subnet_mask_c),
                                                     byref(default_gate_way_c))
         return status
-
+'''
 
 if hasattr(dll, 'GXGetFeatureName'):
     def gx_get_feature_name(handle, feature_id):
@@ -2389,7 +1228,7 @@ if hasattr(dll, 'GXSendCommand'):
         status = dll.GXSendCommand(handle_c, feature_id_c)
         return status
 
-
+'''
 CAP_CALL = CFUNCTYPE(None, POINTER(GxFrameCallbackParam))
 if hasattr(dll, 'GXRegisterCaptureCallback'):
     def gx_register_capture_callback(handle, cap_call):
@@ -2418,7 +1257,7 @@ if hasattr(dll, 'GXUnregisterCaptureCallback'):
 
         status = dll.GXUnregisterCaptureCallback(handle_c)
         return status
-
+'''
 
 if hasattr(dll, 'GXGetImage'):
     def gx_get_image(handle, frame_data, time_out=200):
@@ -2442,49 +1281,6 @@ if hasattr(dll, 'GXGetImage'):
         status = dll.GXGetImage(handle_c, byref(frame_data), time_out_c)
         return status
 
-if hasattr(dll, "GXDQBuf"):
-    def gx_dq_buf(handle, pp_frame_buffer, time_out = 200):
-        """
-        :brief      After starting acquisition, you can call this function to get images directly.
-                    Noting that the interface can not be mixed with the callback capture mode.
-        :param      handle:         The handle of the device
-                                    Type: Long, Greater than 0
-        :param      pp_frame_buffer:[out]User introduced to receive the image data
-                                    Type: Secondary pointer
-        :param      time_out:       The timeout time of capture image.(unit: ms)
-                                    Type: int, minnum: 0
-        :return:    status:         State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        time_out_c = c_uint()
-        time_out_c.value = time_out
-
-        dll.GXDQBuf.argtypes = [c_void_p, ctypes.POINTER(ctypes.POINTER(GxFrameBuffer)), c_uint]
-        dll.GXDQBuf.restype = c_int
-
-        status = dll.GXDQBuf(handle_c, pp_frame_buffer, time_out_c)
-        return status
-
-if hasattr(dll, "GXQBuf"):
-    def gx_q_buf(handle, p_frame_buffer):
-        """
-        :brief      Call this interface to return after using the cache
-        :param      handle:         The handle of the device
-                                    Type: Long, Greater than 0
-        :param      p_frame_buffer: [out]User introduced to receive the image data
-                                    Type: First level pointer
-        :return:    status:         State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        dll.GXQBuf.argtypes = [c_void_p, ctypes.POINTER(GxFrameBuffer)]
-        dll.GXQBuf.restype = c_int
-
-        status = dll.GXQBuf(handle_c, p_frame_buffer)
-        return status
 
 if hasattr(dll, 'GXFlushQueue'):
     def gx_flush_queue(handle):
@@ -2501,6 +1297,7 @@ if hasattr(dll, 'GXFlushQueue'):
         return status
 
 
+'''
 OFF_LINE_CALL = CFUNCTYPE(None, c_void_p)
 if hasattr(dll, 'GXRegisterDeviceOfflineCallback'):
     def gx_register_device_offline_callback(handle, call_back):
@@ -2536,9 +1333,8 @@ if hasattr(dll, 'GXUnregisterDeviceOfflineCallback'):
         call_back_handle_c = c_void_p()
         call_back_handle_c.value = call_back_handle
 
-        status = dll.GXUnregisterDeviceOfflineCallback(handle_c, call_back_handle_c)
+        status = dll.GXUnregisterDeviceOfflineCallback(handle, call_back_handle_c)
         return status
-
 
 
 if hasattr(dll, 'GXFlushEvent'):
@@ -2572,9 +1368,9 @@ if hasattr(dll, 'GXGetEventNumInQueue'):
         return status, event_num.value
 
 
-FEATURE_CALL = CFUNCTYPE(None, c_uint, py_object)
+FEATURE_CALL = CFUNCTYPE(None, c_uint, c_void_p)
 if hasattr(dll, 'GXRegisterFeatureCallback'):
-    def gx_register_feature_callback(handle, call_back, feature_id, args):
+    def gx_register_feature_callback(handle, call_back, feature_id):
         """
         :brief      Register device attribute update callback function.
                     When the current value of the device property has updated, or the accessible property is changed,
@@ -2593,7 +1389,7 @@ if hasattr(dll, 'GXRegisterFeatureCallback'):
         feature_id_c.value = feature_id
 
         call_back_handle = c_void_p()
-        status = dll.GXRegisterFeatureCallback(handle_c, ctypes.py_object(args), call_back, feature_id_c, byref(call_back_handle))
+        status = dll.GXRegisterFeatureCallback(handle_c, None, call_back, feature_id_c, byref(call_back_handle))
 
         return status, call_back_handle.value
 
@@ -2620,6 +1416,7 @@ if hasattr(dll, 'GXUnregisterFeatureCallback'):
 
         status = dll.GXUnregisterFeatureCallback(handle_c, feature_id_c, call_back_handle_c)
         return status
+'''
 
 if hasattr(dll, 'GXExportConfigFile'):
     def gx_export_config_file(handle, file_path):
@@ -2662,7 +1459,7 @@ if hasattr(dll, 'GXImportConfigFile'):
         status = dll.GXImportConfigFile(handle_c, byref(file_path_c), verify_c)
         return status
 
-
+'''
 if hasattr(dll, 'GXReadRemoteDevicePort'):
     def gx_read_remote_device_port(handle, address, buff, size):
         """
@@ -2684,7 +1481,7 @@ if hasattr(dll, 'GXReadRemoteDevicePort'):
         size_c.value = size
 
         status = dll.GXReadRemoteDevicePort(handle_c, address_c, byref(buff), byref(size_c))
-        return status, buff
+        return status, size_c.value
 
 
 if hasattr(dll, 'GXWriteRemoteDevicePort'):
@@ -2707,10 +1504,7 @@ if hasattr(dll, 'GXWriteRemoteDevicePort'):
         size_c = c_uint()
         size_c.value = size
 
-        buff_c = c_int()
-        buff_c.value = buff
-
-        status = dll.GXWriteRemoteDevicePort(handle_c, address_c, byref(buff_c), byref(size_c))
+        status = dll.GXWriteRemoteDevicePort(handle_c, address_c, byref(buff), byref(size_c))
         return status, size_c.value
 
 
@@ -2755,23 +1549,7 @@ if hasattr(dll, 'GXGigEForceIp'):
 
         status = dll.GXGigEForceIp(mac_address_c, ip_address_c, subnet_mask_c, default_gate_way_c)
         return status
-
-
-if hasattr(dll, 'GXGigEResetDevice'):
-    def gx_gige_reset_device(mac_address, reset_device_mode):
-        """
-        :brief      Reconnection/Reset
-        :param      mac_address:        The MAC address of the device(str)
-        :param      reset_device_mode:  Reconnection mode, refer to GxResetDeviceModeEntry
-        :return:    status:             State return value, See detail in GxStatusList
-        """
-        mac_address_c = create_string_buffer(string_encoding(mac_address))
-        reset_device_mode_c = c_uint()
-        reset_device_mode_c.value = reset_device_mode
-
-        status = dll.GXGigEResetDevice(mac_address_c, reset_device_mode_c)
-        return status
-
+'''
 
 if hasattr(dll, 'GXSetAcqusitionBufferNumber'):
     def gx_set_acquisition_buffer_number(handle, buffer_num):
@@ -2790,44 +1568,6 @@ if hasattr(dll, 'GXSetAcqusitionBufferNumber'):
         buffer_num_c.value = buffer_num
 
         status = dll.GXSetAcqusitionBufferNumber(handle_c, buffer_num_c)
-        return status
-
-if hasattr(dll,'GXReadRemoteDevicePortStacked'):
-    def gx_set_read_remote_device_port_stacked(handle, entries, size):
-        """
-        :brief      Batch reads the value of the user-specified register (Registers with command values of 4 bytes only)
-        :entries             [in]Batch read register addresses and values
-                             [out]Read the data to the corresponding register
-        :size                [in]Read the number of device registers
-                             [out]The number of registers that were successfully read
-        :return:    status:  State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        size_c = c_uint()
-        size_c.value = size
-
-        status = dll.GXReadRemoteDevicePortStacked(handle_c, entries, byref(size_c))
-        return status
-
-
-if hasattr(dll,'GXWriteRemoteDevicePortStacked'):
-    def gx_set_write_remote_device_port_stacked(handle, entries, size):
-        """
-        :brief      Batch reads the value of the user-specified register (Registers with command values of 4 bytes only)
-        :entries      [in]The address and value of the batch write register
-        :size         [in]Sets the number of device registers
-                      [out]The number of registers that were successfully written
-        :return:      status:  State return value, See detail in GxStatusList
-        """
-        handle_c = c_void_p()
-        handle_c.value = handle
-
-        size_c = c_uint()
-        size_c.value = size
-        
-        status = dll.GXWriteRemoteDevicePortStacked(handle_c, entries, byref(size_c))
         return status
 
 '''
@@ -2948,16 +1688,6 @@ if hasattr(dll, 'GXStreamOff'):
         return status
 '''
 
-def array_decoding(int_array_c):
-    """
-    :breif      Python3.X: int array
-    :param      int_array_c :   uint_c[]
-    :return:    int_array   :   python array
-    """
-    int_array = []
-    for index in range( len( int_array_c)):
-        int_array.append( int_array_c[index])
-    return int_array
 
 def string_encoding(string):
     """
@@ -2976,16 +1706,8 @@ def string_decoding(string):
     :param      string
     :return:
     """
-    if sys.platform == 'linux2' or sys.platform == 'linux':
-        try:
-            string = string.decode()
-        except UnicodeDecodeError:
-            string = string.decode("gbk")
-    else:
-        try:
-            string = string.decode("gbk")
-        except UnicodeDecodeError:
-            string = string.decode()
+    if sys.version_info.major == 3:
+        string = string.decode()
     return string
 
 
